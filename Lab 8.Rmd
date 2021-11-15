@@ -1,0 +1,94 @@
+---
+title: "Lab 8"
+author: "Julia Wilson"
+date: "11/15/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Attach Packages
+library(tidyverse)
+library(broom)
+library(stargazer)
+library(modelsummary)
+library(corrplot)
+library(here)
+```
+
+
+## Read in data 
+```{r}
+
+homes <- read_csv(here("slo_homes.csv"))
+
+```
+
+A little bit of cleaning: 
+
+Make a subset called homes_sub that only contains observations (rows) where the city is: 
+
+- San Luis Obispo
+- Arroyo Grande
+- Atascadero
+- Santa Maria-Orcutt
+
+```{r}
+# Filter for four cities 
+
+homes_sub <- homes %>%
+  filter(City %in% c("San Luis Obispo", "Arroyo Grande", "Atascadero", "Santa Maria-Orcutt"))
+```
+
+Check your wrangling! 
+In Console: 
+unique(homes_sub$City)
+
+## Do a little exploring of our data 
+
+Summary stats (home price, based on city and sale status): 
+
+Find & return in a nice summary table the mean and sd or home price, grouped by city and sale status 
+
+Notes: 
+- Use na.rm if there is an na value in your data. 
+- Include = FALSE or eval = FALSE
+- In or Out of AES: if it's referring to a constant it should be outside of aes. If its referring to a variable it should be inside aes. 
+- Alpha is used for transparency/translucent 
+- To limit from 0 to 3 million (3e6): set limits
+
+```{r, include = FALSE, eval = FALSE}
+homes_sub %>% 
+  group_by(City, Status) %>% 
+  summarize(mean = mean(Price, na.rm = TRUE),
+            sd = sd(Price, na.rm = TRUE)) 
+
+# Actually I don't want to run this code... set eval = FALSE
+
+# Data Visualization
+ggplot(data = homes_sub, aes(x = Price)) + 
+  geom_density(aes(color = City, fill = City), alpha = 0.3) + 
+  scale_x_continuous(limits = c(0, 3e6))
+
+```
+
+Patterns noticed: 
+Regular sales have higher prices than foreclosures and short sales 
+SLO has higher mean prices than Arroyo Grande 
+Just start looking at how values compare, and is it consistent? 
+
+Explore the relationship (visual data exploration) between square footage & home price. Change the point COLOR by City, and the point shape by sale status. 
+
+```{r}
+ggplot(data = homes_sub, aes(x = SqFt, y = Price)) + 
+  geom_point(aes(color = City)) +
+  geom_smooth(method = lm)
+```
+
+
+
+```
+
+
+
