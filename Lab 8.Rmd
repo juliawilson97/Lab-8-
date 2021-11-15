@@ -82,13 +82,108 @@ Explore the relationship (visual data exploration) between square footage & home
 
 ```{r}
 ggplot(data = homes_sub, aes(x = SqFt, y = Price)) + 
-  geom_point(aes(color = City)) +
+  geom_point(aes(color = City, shape = Status)) +
   geom_smooth(method = lm)
 ```
 
+## Model the relationship with home price as the dependent variable 
 
+Saturated model: include every variable in the data set 
+
+```{r}
+homes_lm1 <- lm(Price ~ City + Bedrooms + SqFt + PricePerSqFt + Status, data = homes_sub)
+
+# Make a subset that only contains quantitative variables 
+
+homes_quant <- homes_sub %>% 
+  select(Price:PricePerSqFt)
+
+# Find correlation
+
+homes_cor <- cor(homes_quant)
+homes_cor
+
+# Correlation Plot:
+corrplot(homes_cor, method = "ellipse")
 
 ```
+
+Bedrooms, bathrooms, sqft all tell you about the size of the house. 
+Just looking at correlation between price, bedroom, bathroom, 
+
+sqft & bathroom have a strong correlation
+sqqft & price, moderately correlated 
+bedrooms & bathrooms, moderately & positively correlated
+
+
+View coefficients by typing homes_lm1 in the console -> 
+Interpreting: for every additional bedroom, the price of the home will decrease by 23124 (which doesn't make sense, you have redundant variables)
+Reference levels: Foreclosure & Arroyo Grande 
+
+# How would I explore the diagnostic plots? 
+
+
+```{r}
+plot(homes_lm1)
+```
+
+Try another model where we simply this a bit: 
+
+- City
+- SqFt
+- Status 
+
+```{r}
+homes_lm2 <- lm(Price ~ City + SqFt + Status, data = homes_sub) 
+```
+
+Model Fit: 
+Higher R^2: 
+84% of variance in home price is explained by the predictor variables in this model. (City, Sqft, Status) explains the variance. 
+
+To get a higher value, you would need variables that don't exist here 
+Adjusted R2: use with multiple linear regression bc it accounts for the fact that model fit will increase as an artifact of adding more variables
+multiple r2: 
+
+How to weight model fit, conceptual understanding, and model complexity 
+- model fit vs complexity: use AIC (provides quant measure that provides comparison of balance between model fit & complexity)
+
+Find the AIC value of each model: 
+
+```{r}
+AIC(homes_lm1)
+AIC(homes_lm2)
+```
+
+Lower AIC implies a better balance of model fit and complexity 
+In this case, you would use homes_lm1. However, you would still have major concerns because you know that there are unneeded variables
+
+Maybe neither of these is what I am looking for. Maybe there is something in between? 
+
+Try another permutation of this model that you think might make sense, check out & compare the model fit, outputs, and AIC value
+
+```{r}
+homes_lm3 <- lm(Price ~ City + Bedrooms + Status, data = homes_sub)
+```
+
+```{r}
+AIC(homes_lm1)
+AIC(homes_lm2)
+AIC(homes_lm3)
+```
+
+Use `modelsummary` to show model outputs side-by-side: 
+
+
+If you use model summary to return model outputs of multiple odels, it wants you to feed it to it as a list. 
+```{r}
+modelsummary(list(homes_lm1, homes_lm2, homes_lm3))
+```
+
+
+
+
+
 
 
 
