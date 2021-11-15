@@ -180,8 +180,17 @@ If you use model summary to return model outputs of multiple odels, it wants you
 modelsummary(list(homes_lm1, homes_lm2, homes_lm3))
 ```
 
+Couple ways to make predictions with our model 
 
+## Start making predictions with this model
 
+Use `broom::augment()`
+
+```{r}
+homes_predicted <- augment(homes_lm1)
+```
+
+Use the `predict()` function to try out your model on new scenarios that you create. 
 
 
 
